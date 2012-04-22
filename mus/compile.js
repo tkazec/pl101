@@ -1,4 +1,4 @@
-var compile = function (musexpr, time) {
+module.exports = function compile (musexpr, time) {
 	var root = time === undefined,
 		left, right;
 	

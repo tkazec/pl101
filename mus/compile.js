@@ -4,14 +4,10 @@ module.exports = function compile (musexpr, time) {
 	
 	time = time || 0;
 	
-	if (musexpr.tag === "note") {
+	if (musexpr.tag === "note" || musexpr.tag === "rest") {
 		musexpr.start = time;
 		
 		return (root ? [] : [musexpr.dur]).concat(musexpr);
-	} else if (musexpr.tag === "rest") {
-		musexpr.start = time;
-		
-		return (root ? [] : [musexpr.duration]).concat(musexpr);
 	} else if (musexpr.tag === "seq") {
 		left = compile(musexpr.left, time);
 		time += left.shift();

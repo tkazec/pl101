@@ -1,3 +1,5 @@
+"use strict";
+
 var compile = require("./compile");
 
 var melody_mus = 

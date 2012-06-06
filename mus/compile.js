@@ -1,6 +1,9 @@
+"use strict";
+
 module.exports = function compile (musexpr, time) {
-	var root = time === undefined,
-		left, right;
+	var root = time === undefined;
+	var left;
+	var right;
 	
 	time = time || 0;
 	

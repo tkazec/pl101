@@ -15,6 +15,8 @@ atom
 		{ return v.join(""); }
 
 expression
-	= atom
+	= space "'" v:expression space
+		{ return ["quote", v]; }
+	/ atom
 	/ space "(" v:expression* ")" space
 		{ return v; }

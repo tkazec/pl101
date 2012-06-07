@@ -1,19 +1,17 @@
-start =
-	expression
+start
+	= expression
 
-validchar =
-	[0-9a-zA-Z_?!+-=@#$%^&*/.]
+space
+	= [ \n\t]
 
-atom =
-	v:validchar+
+char
+	= [0-9a-zA-Z_?!+-=@#$%^&*/.]
+
+atom
+	= space* v:char+ space*
 		{ return v.join(""); }
 
-expression =
-	atom
-	/
-	"(" first:expression rest:spaced* ")"
-    	{ return [first].concat(rest); }
-
-spaced =
-	" " v:expression
+expression
+	= atom
+	/ space* "(" v:expression* ")" space*
 		{ return v; }

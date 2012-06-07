@@ -1,17 +1,20 @@
 start
 	= expression
 
-space
-	= [ \t\r\n]
-
 char
 	= [-0-9a-zA-Z_?!+=@#$%^&*/.]
 
+spacechar
+	= [ \t\r\n]*
+
+space
+	= spacechar (";;" (!"\n" .)* "\n" spacechar)*
+
 atom
-	= space* v:char+ space*
+	= space v:char+ space
 		{ return v.join(""); }
 
 expression
 	= atom
-	/ space* "(" v:expression* ")" space*
+	/ space "(" v:expression* ")" space
 		{ return v; }

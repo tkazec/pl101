@@ -11,7 +11,9 @@ space
 	= spacechar (";;" (!"\n" .)* "\n" spacechar)*
 
 atom
-	= space v:char+ space
+	= space sign:[+-]? int:[0-9]+ dec:("." [0-9]+)? space
+		{ return parseFloat(sign + int.join("") + (dec && "." + dec[1].join("")), 10); }
+	/ space v:char+ space
 		{ return v.join(""); }
 
 expression

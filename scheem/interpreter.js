@@ -12,7 +12,7 @@ module.exports = function interpret (expr, env) {
 	var args = expr;
 	
 	var evl = function (expr) {
-		interpret(expr, env);
+		return interpret(expr, env);
 	};
 	
 	switch (fn) {

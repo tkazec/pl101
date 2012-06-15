@@ -31,13 +31,14 @@ module.exports = function interpret (expr, env) {
 			return evl(args[0]) < evl(args[1]);
 		case ">":
 			return evl(args[0]) > evl(args[1]);
-		
-		case "quote":
-			return args[0];
+		case "if":
+			return evl(args[0]) ? evl(args[1]) : evl(args[2]);
 		
 		case "set":
 			env[args[0]] = evl(args[1]);
 			return;
+		case "quote":
+			return args[0];
 		
 		case "cons":
 			var arr = evl(args[1]);
@@ -48,10 +49,11 @@ module.exports = function interpret (expr, env) {
 		case "cdr":
 			return evl(args[0]).slice(1);
 		
-		case "if":
-			return evl(args[0]) ? evl(args[1]) : evl(args[2]);
-		
 		case "go":
 			return args.map(evl).pop();
+		
+		case "log":
+			console.log(args.map(evl));
+			return;
 	}
 };

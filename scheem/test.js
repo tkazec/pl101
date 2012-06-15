@@ -2,12 +2,8 @@
 
 /*** setup ***/
 var assert = require("assert");
-var fs = require("fs");
-var PEG = require("pegjs");
 
-var data = fs.readFileSync(__dirname + "/grammar.peg", "utf-8");
-
-var parse = PEG.buildParser(data).parse;
+var parse = require("./parser");
 var interpret = require("./interpreter");
 
 
@@ -76,10 +72,87 @@ describe("The grammar", function () {
 });
 
 describe("The interpreter", function () {
+	it("should handle using code as data", function () {
+		testEval(
+			"'(1 2 3 (4 5 6) 7 8 9)",
+			[1, 2, 3, [4, 5, 6], 7, 8, 9]
+		);
+	});
+	
 	it("should do math", function () {
 		testEval(
 			"(/ (- (* (+ 10 34) 3) 6) 3)",
 			42
+		);
+	});
+	
+	it("should compare stuff", function () {
+		testEval(
+			"(< 5 10)",
+			true
+		);
+		
+		testEval(
+			"(> 461789 527403)",
+			false
+		);
+		
+		testEval(
+			"(= 'aaaa 'aaaa)",
+			true
+		);
+		
+		testEval(
+			"(= 'aaaa 'aaab)",
+			false
+		);
+	});
+	
+	it("should retrieve variables", function () {
+		testEval(
+			"(/ 5 x)",
+			0.5,
+			{ x: 10 }
+		);
+	});
+	
+	it("should set and update variables", function () {
+		var env = {};
+		
+		interpret(parse("(set x 2)"), env);
+		interpret(parse("(set x 42)"), env);
+		interpret(parse("(set y 8)"), env);
+		
+		testEval(
+			"(+ x y)",
+			50,
+			env
+		);
+	});
+	
+	it("should have a flow", function () {
+		testEval(
+			"(go (set z 10) (set x 5) (set y (+ x z)) (set x (* y x)) (* x z))",
+			750
+		);
+	});
+	
+	it("should use conditioner", function () {
+		testEval(
+			"(if (= 1 1) (if (= 2 3) 10 11) 12)",
+			11
+		);
+		
+		testEval(
+			"(if (> 1 (10 < 5)) error 3)",
+			3
+		);
+	});
+	
+	it("should have a lisp", function () {
+		testEval(
+			"(go (set x (car '((1 2 3) 4 5 6))) (set y (cdr x)) (cons 3 y))",
+			[3, 2, 3]
 		);
 	});
 });

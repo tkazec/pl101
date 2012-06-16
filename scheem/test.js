@@ -13,7 +13,7 @@ var testParse = function (src, out) {
 };
 
 var testEval = function (src, out, env) {
-	assert.deepEqual(interpret(parse(src), env || {}), out);
+	assert.deepEqual(interpret(parse(src), env || { vars: {} }), out);
 };
 
 
@@ -112,16 +112,16 @@ describe("The interpreter", function () {
 		testEval(
 			"(/ 5 x)",
 			0.5,
-			{ x: 10 }
+			{ vars: { x: 10 } }
 		);
 	});
 	
 	it("should set and update variables", function () {
-		var env = {};
+		var env = { vars: {} };
 		
-		interpret(parse("(set x 2)"), env);
+		interpret(parse("(def x 2)"), env);
 		interpret(parse("(set x 42)"), env);
-		interpret(parse("(set y 8)"), env);
+		interpret(parse("(def y 8)"), env);
 		
 		testEval(
 			"(+ x y)",
@@ -132,7 +132,7 @@ describe("The interpreter", function () {
 	
 	it("should have a flow", function () {
 		testEval(
-			"(go (set z 10) (set x 5) (set y (+ x z)) (set x (* y x)) (* x z))",
+			"(go (def z 10) (def x 5) (def y (+ x z)) (set x (* y x)) (* x z))",
 			750
 		);
 	});
@@ -151,7 +151,7 @@ describe("The interpreter", function () {
 	
 	it("should have a lisp", function () {
 		testEval(
-			"(go (set x (car '((1 2 3) 4 5 6))) (set y (cdr x)) (cons 3 y))",
+			"(go (def x (car '((1 2 3) 4 5 6))) (def y (cdr x)) (cons 3 y))",
 			[3, 2, 3]
 		);
 	});

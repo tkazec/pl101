@@ -144,7 +144,7 @@ describe("The interpreter", function () {
 		);
 		
 		testEval(
-			"(if (> 1 (10 < 5)) error 3)",
+			"(if (> 1 (< 10 5)) 3 error)",
 			3
 		);
 	});

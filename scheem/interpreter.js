@@ -7,33 +7,30 @@ module.exports = function (expr, env) {
 		return module.exports(expr, env);
 	};
 	
-	var find = function (name, ctx) {
-		ctx = ctx || env;
-		return name in ctx.vars ? ctx.vars[name] : find(name, ctx.outer || { vars: lib });
-	};
-	
-	var update = function (name, val, ctx) {
-		ctx = ctx || env;
-		
-		while (!(name in ctx.vars)) {
-			ctx = ctx.outer;
+	var locate = function (ctx, name, val) {
+		if (name in ctx.vars) {
+			return arguments.length === 3 ? (ctx.vars[name] = val) : ctx.vars[name];
+		} else if (ctx.outer && arguments.length === 3) {
+			return locate(ctx.outer, name, val);
+		} else if (!ctx.lib && arguments.length === 2) {
+			return locate(ctx.outer || { vars: lib, lib: true }, name);
+		} else {
+			throw new ReferenceError(name + " could not be located.");
 		}
-		
-		return ctx.vars[name] = val;
 	};
 	
 	switch (typeof expr) {
 		case "number":
 			return expr;
 		case "string":
-			return find(expr);
+			return locate(env, expr);
 	}
 	
 	switch (expr = args.shift()) {
 		case "def":
 			return env.vars[args[0]] = evl(args[1]);
 		case "set":
-			return update(args[0], evl(args[1]));
+			return locate(env, args[0], evl(args[1]));
 		
 		case "quote":
 			return args[0];

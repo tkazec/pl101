@@ -8,7 +8,8 @@ spacechar
 	= [ \t\r\n]*
 
 space
-	= spacechar (";;" (!"\n" .)* "\n" spacechar)*
+	= spacechar ";;" [^\n]* !.
+	/ spacechar (";;" [^\n]* "\n" spacechar)*
 
 atom
 	= space sign:[+-]? int:[0-9]+ dec:("." [0-9]+)? space

@@ -61,6 +61,11 @@ describe("The grammar", function () {
 			"(+;;test\n1 1)",
 			["+", 1, 1]
 		);
+		
+		testParse(
+			"0;;test",
+			0
+		);
 	});
 	
 	it("should ease quoting", function () {

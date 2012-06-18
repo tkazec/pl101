@@ -187,6 +187,11 @@ describe("The interpreter", function () {
 	
 	it("should recurse", function () {
 		testEval(
+			"(seq (def down (lambda (n) (if (> n 0) (down (- n 1)) 0))) (down 5))",
+			0
+		);
+		
+		testEval(
 			"(seq (def factorial (lambda (n) (if (= n 0) 1 (* n (factorial (- n 1)))))) (factorial 5))",
 			120
 		);

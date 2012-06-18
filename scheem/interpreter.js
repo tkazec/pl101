@@ -1,8 +1,6 @@
 "use strict";
 
 module.exports = function (expr, env) {
-	var args = expr;
-	
 	var evl = function (expr) {
 		return module.exports(expr, env);
 	};
@@ -26,7 +24,9 @@ module.exports = function (expr, env) {
 			return locate(env, expr);
 	}
 	
-	switch (expr = args.shift()) {
+	var args = expr.slice(1);
+	
+	switch (expr = expr[0]) {
 		case "def":
 			return env.vars[args[0]] = evl(args[1]);
 		case "set":
@@ -102,5 +102,5 @@ var lib = {
 	
 	"log": function () {
 		console.log.apply(console, arguments);
-	},
+	}
 };

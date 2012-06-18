@@ -31,6 +31,14 @@ module.exports = function (expr, env) {
 			return env.vars[args[0]] = evl(args[1]);
 		case "set":
 			return locate(env, args[0], evl(args[1]));
+		case "let":
+			var vars = {};
+			
+			args[0].forEach(function (pair) {
+				vars[pair[0]] = evl(pair[1]);
+			});
+			
+			return module.exports(args[1], { vars: vars, outer: env });
 		
 		case "quote":
 			return args[0];

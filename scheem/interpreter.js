@@ -30,22 +30,33 @@ module.exports = function (expr, env) {
 	}
 	
 	switch (expr = args.shift()) {
-		case "quote":
-			return args[0];
-		
 		case "def":
 			return env.vars[args[0]] = evl(args[1]);
 		case "set":
 			return update(args[0], evl(args[1]));
 		
+		case "quote":
+			return args[0];
+		case "lambda":
+			return function () {
+				var vars = {};
+				var params = arguments;
+				
+				args[0].forEach(function (name, i) {
+					vars[name] = params[i];
+				});
+				
+				return module.exports(args[1], { vars: vars, outer: env });
+			};
+		
 		case "if":
 			return evl(args[0]) ? evl(args[1]) : evl(args[2]);
 		
-		case "go":
+		case "seq":
 			return args.map(evl).pop();
 		
 		default:
-			return find(expr).apply(null, args.map(evl));
+			return evl(expr).apply(null, args.map(evl));
 	}
 };
 

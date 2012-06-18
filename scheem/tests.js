@@ -130,9 +130,21 @@ describe("The interpreter", function () {
 		);
 	});
 	
+	it("should let us have closure", function () {
+		testEval(
+			"(let ((x 2) (y 5)) (+ x y))",
+			7
+		);
+		
+		testEval(
+			"(let ((x 'a) (y 2)) (let ((x 3)) (* x y)))",
+			6
+		);
+	});
+	
 	it("should have a flow", function () {
 		testEval(
-			"(go (def z 10) (def x 5) (def y (+ x z)) (set x (* y x)) (* x z))",
+			"(seq (def z 10) (def x 5) (def y (+ x z)) (set x (* y x)) (* x z))",
 			750
 		);
 	});
@@ -151,8 +163,37 @@ describe("The interpreter", function () {
 	
 	it("should have a lisp", function () {
 		testEval(
-			"(go (def x (car '((1 2 3) 4 5 6))) (def y (cdr x)) (cons 3 y))",
+			"(seq (def x (car '((1 2 3) 4 5 6))) (def y (cdr x)) (cons 3 y))",
 			[3, 2, 3]
+		);
+	});
+	
+	it("should love lambs", function () {
+		testEval(
+			"((lambda (x) (+ x 1)) 5)",
+			6
+		);
+		
+		testEval(
+			"(((lambda (x) (lambda (y) (+ x y))) 5) 3)",
+			8
+		);
+		
+		testEval(
+			"(((lambda (x) (lambda (x) (+ x x))) 5) 3)",
+			6
+		);
+	});
+	
+	it("should recurse", function () {
+		testEval(
+			"(seq (def factorial (lambda (n) (if (= n 0) 1 (* n (factorial (- n 1)))))) (factorial 5))",
+			120
+		);
+		
+		testEval(
+			"(seq (def make-account (lambda (balance) (lambda (amt) (set balance (+ balance amt))))) (def a (make-account 100)) (a -20))",
+			80
 		);
 	});
 });

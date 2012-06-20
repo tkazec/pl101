@@ -1,0 +1,95 @@
+start
+	= space seq:statements
+		{ return seq; }
+
+space
+	= [ \t\r\n]*
+
+number
+	= sign:[+-]? int:[0-9]+ dec:("." [0-9]+)?
+		{ return parseFloat(sign + int.join("") + (dec && "." + dec[1].join("")), 10); }
+
+identifier
+	= first:[a-zA-Z_] rest:[0-9a-zA-Z_]*
+		{ return first + rest.join(""); }
+
+comp_op
+	= "<="
+	/ ">="
+	/ "!="
+	/ "=="
+	/ "<"
+	/ ">"
+
+comparative
+	= left:additive space op:comp_op space right:comparative
+		{ return { tag: op, left: left, right: right }; }
+	/ additive
+
+additive_op
+	= "+"
+	/ "-"
+
+additive
+	= left:multiplicative space op:additive_op space right:additive
+		{ return { tag: op, left: left, right: right }; }
+	/ multiplicative
+
+mult_op
+	= "*"
+	/ "/"
+
+multiplicative
+	= left:primary space op:mult_op space right:multiplicative
+		{ return { tag: op, left: left, right: right }; }
+	/ primary
+
+primary
+	= number
+	/ v:identifier "(" space ")"
+		{ return { tag: "call", name: v, args: [] }; }
+	/ v:identifier "(" space args:arglist space ")"
+		{ return { tag: "call", name: v, args: args }; }
+	/ v:identifier
+		{ return { tag: "ident", name: v }; }
+	/ "(" space expression:expression space ")"
+		{ return expression; }
+
+comma_expression
+	= "," space expr:expression
+		{ return expr; }
+
+arglist
+	= first:expression rest:comma_expression*
+		{ return [first].concat(rest); }
+
+comma_identifier
+	= "," space v:identifier
+		{ return v; }
+
+ident_list
+	= first:identifier rest:comma_identifier*
+		{ return [first].concat(rest); }
+
+expression
+    = expr:comparative
+        { return expr; }
+
+statement
+	= "if" space "(" space cond:expression space ")" space "{" space body:statements space "}" space
+		{ return { tag: "if", expr: cond, body: body }; }
+	/ "fun" space name:identifier space "(" space ")" space "{" space body:statements space "}" space
+		{ return { tag: "fun", name: name, args: [], body: body }; }
+	/ "fun" space name:identifier space "(" space args:ident_list space ")" space "{" space body:statements space "}" space
+		{ return { tag: "fun", name: name, args: args, body: body }; }
+	/ "repeat" space "(" space count:expression space ")" space "{" space body:statements space "}" space
+		{ return { tag: "repeat", expr: count, body: body }; }
+	/ "var " space name:identifier space ";" space
+		{ return { tag: "var", name: name }; }
+	/ name:identifier space ":" space val:expression space ";" space
+		{ return { tag: ":", left: name, right: val }; }
+	/ expr:expression space ";" space
+		{ return { tag: "ignore", body: expr }; }
+
+statements
+	= statement*

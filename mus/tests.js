@@ -1,6 +1,6 @@
 "use strict";
 
-var compile = require("./compile");
+var compile = require("./compiler");
 
 var melody_mus = 
 	{ tag: 'seq',

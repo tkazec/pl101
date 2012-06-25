@@ -1,24 +1,10 @@
 "use strict";
 
-var lib = {
-	forward: function (dist) {
-		console.log("forward", dist);
-	},
-	left: function (angle) {
-		console.log("left", angle);
-	},
-	right: function (angle) {
-		console.log("right", angle);
-	}
-};
-
 var locate = function (ctx, name, val) {
 	if (name in ctx.vars) {
 		return arguments.length === 3 ? (ctx.vars[name] = val) : ctx.vars[name];
-	} else if (ctx.outer && arguments.length === 3) {
-		return locate(ctx.outer, name, val);
-	} else if (!ctx.lib && arguments.length === 2) {
-		return locate(ctx.outer || { vars: lib, lib: true }, name);
+	} else if (ctx.outer) {
+		return arguments.length === 3 ? locate(ctx.outer, name, val) : locate(ctx.outer, name);
 	} else {
 		throw new ReferenceError(name + " could not be located.");
 	}
@@ -67,11 +53,11 @@ var stmt = function (env, tree) {
 			return expr(env, tree.body);
 		
 		case "var":
-			return locate(env, tree.name, 0);
+			return env.vars[tree.name] = 0;
 		case ":":
 			return locate(env, tree.left, expr(env, tree.right));
 		case "fun":
-			locate(env, tree.name, function () {
+			env.vars[tree.name] = function () {
 				var vars = {};
 				var params = arguments;
 				
@@ -80,7 +66,7 @@ var stmt = function (env, tree) {
 				});
 				
 				return seq({ vars: vars, outer: env }, tree.body);
-			});
+			};
 			
 			return null;
 		
@@ -110,6 +96,52 @@ var seq = function (env, list) {
 	}).pop();
 };
 
-module.exports = function (tree, env) {
-	return seq(env, tree);
+module.exports = function (cvs) {
+	this.cvs = cvs;
+	this.ctx = cvs.getContext("2d");
+	
+	this.env = {
+		vars: {
+			forward: this.forward.bind(this),
+			left: this.left.bind(this),
+			right: this.right.bind(this)
+		}
+	};
+	
+	this.reset();
+};
+
+module.exports.prototype = {
+	reset: function () {
+		this.ctx.fillStyle = "#FFF";
+		this.ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
+		
+		this.ctx.strokeStyle = "#0060FF";
+		this.ctx.lineWidth = 2;
+		
+		this.x = this.cvs.width / 2;
+		this.y = this.cvs.height / 2;
+		this.angle = 0;
+		this.ctx.moveTo(this.x, this.y);
+	},
+	forward: function (dist) {
+		this.x += Math.cos(this.angle * (Math.PI / 180)) * dist;
+		this.y += Math.sin(this.angle * (Math.PI / 180)) * dist;
+		
+		this.ctx.lineTo(this.x, this.y);
+	},
+	left: function (deg) {
+		this.angle -= deg;
+	},
+	right: function (deg) {
+		this.angle += deg;
+	},
+	eval: function (tree) {
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.x, this.y);
+		
+		seq(this.env, tree);
+		
+		this.ctx.stroke();
+	}
 };

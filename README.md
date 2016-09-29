@@ -1,4 +1,4 @@
-Files for Nathan's University PL101. Finished 2012-06-28.
+Files for [Nathan's University](http://nathansuniversity.com) PL101 class, finished 2012-06-28. The final source code is preserved here, dedicated to the public domain under the [CC0 1.0 license](https://creativecommons.org/publicdomain/zero/1.0/). – [Teddy Cross](https://teddy.io)
 
 ---
 
@@ -10,7 +10,3 @@ A simple Lisp based on Scheme, for lessons 3-5. To correct inconsistencies and o
 
 **tortoise/**  
 Turtle graphics, in a custom C-style language, for lesson 6. Deviates slightly from the provided syntax, and writes to a file instead of using a web interface. Comes with a grammar, interpreter, rasterizer, and some tests. Requires PEG.js, Mocha, and node-canvas. Not as refined as Scheem, but it turned out okay.
-
----
-
-Written and freed into the [public domain](http://creativecommons.org/publicdomain/zero/1.0/) by [Teddy Cross](http://tkaz.ec).
